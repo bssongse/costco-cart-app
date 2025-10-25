@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 장바구니 컬렉션
+    match /carts/{cartId} {
+      // 누구나 읽을 수 있음 (링크만 있으면 접근)
+      allow read: if true;
+
+      // 인증된 사용자만 생성/수정 가능 (익명 사용자 포함)
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null;
+
+      // 하위 아이템 컬렉션
+      match /items/{itemId} {
+        // 누구나 읽을 수 있음
+        allow read: if true;
+
+        // 인증된 사용자만 생성/수정/삭제 가능 (익명 사용자 포함)
+        allow create, update, delete: if request.auth != null;
+      }
+    }
+
+    // 사용자 프로필 컬렉션
+    match /users/{userId} {
+      // 본인만 읽고 쓸 수 있음
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
