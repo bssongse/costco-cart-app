@@ -145,7 +145,22 @@ function App() {
     e.preventDefault();
     if (!newItemName.trim()) return;
 
+    // 사용자 인증 확인
+    if (!user) {
+      console.error('사용자가 인증되지 않았습니다.');
+      alert('사용자 인증 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
+    // cartId 확인
+    if (!cartId) {
+      console.error('장바구니 ID가 없습니다.');
+      alert('장바구니를 초기화하는 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
     try {
+      console.log('아이템 추가 시작:', { cartId, user: user.uid });
       const itemsRef = collection(db, 'carts', cartId, 'items');
       await addDoc(itemsRef, {
         name: newItemName,
@@ -157,13 +172,26 @@ function App() {
         createdAt: new Date().toISOString()
       });
 
+      console.log('아이템 추가 성공');
       setNewItemName('');
       setNewItemQuantity(1);
       setNewItemPrice('');
       setNewItemCategory('식품');
     } catch (error) {
-      console.error('아이템 추가 오류:', error);
-      alert('아이템 추가에 실패했습니다.');
+      console.error('아이템 추가 오류 상세:', error);
+      console.error('에러 코드:', error.code);
+      console.error('에러 메시지:', error.message);
+
+      // 더 구체적인 에러 메시지
+      let errorMessage = '아이템 추가에 실패했습니다.\n';
+      if (error.code === 'permission-denied') {
+        errorMessage += '권한이 없습니다. Firebase 설정을 확인해주세요.';
+      } else if (error.code === 'unavailable') {
+        errorMessage += '네트워크 연결을 확인해주세요.';
+      } else {
+        errorMessage += `오류: ${error.message}`;
+      }
+      alert(errorMessage);
     }
   };
 

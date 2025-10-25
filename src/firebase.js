@@ -12,6 +12,16 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
+// Firebase 설정 값 확인 (디버깅용)
+console.log('Firebase 설정 확인:', {
+  apiKey: firebaseConfig.apiKey ? '설정됨' : '없음',
+  authDomain: firebaseConfig.authDomain || '없음',
+  projectId: firebaseConfig.projectId || '없음',
+  storageBucket: firebaseConfig.storageBucket || '없음',
+  messagingSenderId: firebaseConfig.messagingSenderId || '없음',
+  appId: firebaseConfig.appId ? '설정됨' : '없음'
+});
+
 // Firebase 초기화
 const app = initializeApp(firebaseConfig);
 
